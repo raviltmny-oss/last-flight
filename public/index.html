@@ -233,6 +233,31 @@ body.touch #sleepFx .kbtxt,body:not(.touch) #sleepFx .tchtxt{display:none}
 .gi{width:20px;height:20px;vertical-align:-5px;margin-right:6px}
 .gbtns{display:flex;gap:6px}
 .gbtns .go{min-width:0}
+
+.screen:has(.menu.main){background:radial-gradient(ellipse at 30% 40%,rgba(8,30,40,.22),rgba(4,14,20,.78))}
+.menu.main{position:relative}
+.mfx{position:fixed;inset:0;z-index:-1;pointer-events:none;overflow:hidden}
+.mfx .pl{position:absolute;top:9%;left:0;width:92px;height:56px;animation:mfxPlane 26s linear infinite;animation-delay:-6s;filter:drop-shadow(0 18px 10px rgba(0,0,0,.35))}
+.mfx .pl svg{width:100%;height:100%;animation:mfxBob 2.6s ease-in-out infinite}
+.mfx .fl{position:absolute;left:var(--x);top:var(--y);width:var(--s);height:var(--s);border-radius:50%;background:#ffd98a;box-shadow:0 0 10px 3px rgba(255,200,90,.7);opacity:0;animation:mfxFly var(--d) ease-in-out infinite;animation-delay:var(--w)}
+.mfx .gl{position:absolute;left:0;right:0;bottom:0;height:34%;background:linear-gradient(to top,rgba(242,154,46,.14),transparent)}
+@keyframes mfxPlane{from{transform:translate(-120px,40px) rotate(4deg)}to{transform:translate(calc(100vw + 120px),-30px) rotate(4deg)}}
+@keyframes mfxBob{50%{transform:translateY(5px) rotate(-2deg)}}
+@keyframes mfxFly{0%{opacity:0;transform:translate(0,0)}20%{opacity:.95}50%{opacity:.5;transform:translate(26px,-34px)}80%{opacity:.95}100%{opacity:0;transform:translate(-18px,-72px)}}
+@keyframes mfxIn{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
+@keyframes mfxTitle{0%,100%{text-shadow:0 4px 30px rgba(0,0,0,.5),0 0 0 rgba(242,154,46,0)}50%{text-shadow:0 4px 30px rgba(0,0,0,.5),0 0 26px rgba(242,154,46,.55)}}
+@keyframes mfxBtn{50%{box-shadow:0 0 0 2px rgba(242,154,46,.45),0 0 24px rgba(242,154,46,.55)}}
+.menu.main>.eyebrow,.menu.main>h1,.menu.main>.tag,.menu.main .mlist .mbtn,.menu.main>.foot{animation:mfxIn .6s cubic-bezier(.2,.8,.2,1) both}
+.menu.main>h1{animation:mfxIn .6s .08s cubic-bezier(.2,.8,.2,1) both,mfxTitle 4.5s 1s ease-in-out infinite}
+.menu.main>.tag{animation-delay:.16s}
+.menu.main .mlist .mbtn:nth-child(1){animation-delay:.24s}.menu.main .mlist .mbtn:nth-child(2){animation-delay:.3s}.menu.main .mlist .mbtn:nth-child(3){animation-delay:.36s}
+.menu.main .mlist .mbtn:nth-child(4){animation-delay:.42s}.menu.main .mlist .mbtn:nth-child(5){animation-delay:.48s}.menu.main .mlist .mbtn:nth-child(6){animation-delay:.54s}.menu.main .mlist .mbtn:nth-child(7){animation-delay:.6s}
+.menu.main>.foot{animation-delay:.66s}
+.menu.main .mbtn{transition:transform .15s,border-color .15s,background .15s}
+.menu.main .mbtn:hover{transform:translateX(5px);border-color:rgba(242,154,46,.7)}
+.menu.main .mbtn:active{transform:scale(.98)}
+.menu.main .mbtn.primary{animation:mfxIn .6s .24s cubic-bezier(.2,.8,.2,1) both,mfxBtn 2.8s 1.2s ease-in-out infinite}
+@media (prefers-reduced-motion:reduce){.mfx .pl,.mfx .fl{animation:none;opacity:0}.menu.main>*,.menu.main .mbtn,.menu.main>h1{animation:none!important}}
 .mbtn.yel{background:#ffd60a;color:#2a2200;border-color:transparent;font-weight:700;box-shadow:0 0 0 2px rgba(255,214,10,.35),0 0 18px rgba(255,214,10,.45)}
 .mbtn.yel:hover{filter:brightness(1.06)}
 #giveBtn{position:fixed;right:calc(24px + env(safe-area-inset-right,0px));bottom:calc(var(--dockH) + 124px + env(safe-area-inset-bottom,0px));width:64px;height:64px;border-radius:50%;border:2px solid rgba(255,255,255,.5);background:rgba(255,214,10,.95);color:#2a2200;font-family:var(--fd);font-size:9.5px;letter-spacing:0;padding:0;touch-action:none;box-shadow:0 0 14px rgba(255,214,10,.5)}
@@ -1968,6 +1993,12 @@ function helpHTML(){
       <li>Вместе (меню «Играть вместе»): подойдите к товарищу и нажмите «Действие», чтобы передать вещи; так же поднимают товарища без сознания. Ночь ускоряется, только когда спят все. Пилотирует хозяин острова, остальные садятся в самолёт пассажирами.</li>
     </ul>`;
 }
+function menuFx(){
+  const plane = '<svg viewBox="0 0 92 56" aria-hidden="true"><ellipse cx="46" cy="52" rx="30" ry="2.5" fill="rgba(0,0,0,.0)"/><path d="M14 30 L8 18 L16 18 L24 28Z" fill="#d94a3a"/><path d="M12 31 Q40 22 76 28 Q86 30 88 33 Q86 36 76 37 Q40 40 12 34Z" fill="#f3ead6"/><path d="M12 31 Q40 22 76 28 L76 31 Q40 27 12 33Z" fill="#d94a3a"/><path d="M40 33 L30 48 L44 48 L54 34Z" fill="#e5dcc5"/><path d="M40 28 L34 14 L46 14 L54 27Z" fill="#e5dcc5"/><rect x="58" y="26" width="12" height="6" rx="3" fill="#7fb6d6"/><circle cx="86" cy="33" r="1.8" fill="#444"/><rect x="86" y="24" width="1.6" height="18" rx=".8" fill="rgba(60,60,60,.55)"/></svg>';
+  let f = '';
+  for (let i = 0; i < 16; i++) f += '<i class="fl" style="--x:' + (4 + (i*53 % 92)) + '%;--y:' + (30 + (i*37 % 62)) + '%;--s:' + (3 + (i % 3)) + 'px;--d:' + (5 + (i % 5)) + 's;--w:-' + ((i*1.3) % 6).toFixed(1) + 's"></i>';
+  return '<div class="mfx" aria-hidden="true"><div class="gl"></div>' + f + '<div class="pl">' + plane + '</div></div>';
+}
 function showMenu(view){
   if (view === 'main' || view === 'pause') menuCtx = view;
   const sv = loadSave();
@@ -1976,6 +2007,7 @@ function showMenu(view){
     h = recordsHTML();
   } else if (view === 'main'){
     h = `<div class="card menu main">
+      ${menuFx()}
       <div class="eyebrow">ВЫЖИВАНИЕ · РЕМОНТ · ОБОРОНА · ВЗЛЁТ</div>
       <h1>Последний рейс</h1>
       <p class="tag">Лёгкий одномоторный RA-1904 сел на вынужденную на необитаемом острове. Почините семь систем самолёта и улетайте, пока пираты не растащили его по частям.</p>
