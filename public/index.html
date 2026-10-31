@@ -5595,6 +5595,7 @@ function netMyName(){ return cleanName(SETTINGS.name || NET.myProfileName || '')
 function netCancelWait(){ if (NET.role !== 'solo') netLeave(); showMenu('coop'); }
 function netLeave(){
   const rm = NET.rm, rw = NET.rw, api = NET.sapi, wasHost = NET.role === 'host';
+  if (wasHost && NET.transport !== 'lan') netSaveGuest(true);   // the host's bag waits for the way back as a guest
   if (wasHost && NET.api && NET.transport === 'claude') NET.api.presence({ open:null }).catch(() => {});
   if (wasHost && rm){ try { rm.presence({ hd:Object.assign(netHeader(), { m:'x' }) }).catch(() => {}); } catch (e) {} }
   NET.role = 'solo'; NET.stage = ''; NET.rm = null; NET.rw = null; NET.sapi = null; NET.code = ''; NET.diff = null; NET.k = 1;
@@ -5722,6 +5723,12 @@ function netMateFromPresence(m, me){
 }
 function netHostRead(now){
   const peers = NET.rm ? NET.rm.peers() : [];
+  // the island was taken over while we were out of touch: step aside
+  for (const pr of peers){
+    const ps = pr.presence;
+    if (pr.sameTab || !ps || ps.h !== 1 || ps.c !== NET.code || pr.peer === NET.me) continue;
+    if ((ps.ep | 0) > (NET.epoch | 0)){ netEnd('Пока у вас не было связи, остров перешёл к вашему напарнику. Войдите на него по коду ' + NET.code.toUpperCase() + ' как гость.'); return; }
+  }
   const seen = new Set();
   for (const pr of peers){
     if (pr.sameTab || pr.kind !== 'viewer') continue;
@@ -5848,7 +5855,7 @@ function netHostGive(m, target, id, n){
 function netHostSendMain(){
   const now = performance.now();
   const pl = []; for (const m of NET.mates.values()) if (m.admitted) pl.push([m.peer, m.slot]);
-  const base = { v:NET_V, h:1, c:NET.code, df:SETTINGS.diff, me:G.mode === 'play' ? netMyMe() : null, hd:netHeader(), pl, gr:NET.grants, dm:NET.dmg, rv:NET.rev };
+  const base = { v:NET_V, h:1, c:NET.code, df:NET.diff || SETTINGS.diff, ep:NET.epoch | 0, me:G.mode === 'play' ? netMyMe() : null, hd:netHeader(), pl, gr:NET.grants, dm:NET.dmg, rv:NET.rev };
   if (NET.transport !== 'claude') base.nm = netMyName();
   const s = netSnap();
   base.s = s;
@@ -6054,7 +6061,7 @@ function netGuestHeader(hd){
   if (m === 't' && G.mode === 'play' && G.aboard) netGuestTakeoff(hd);
   else if (m === 'w' && (G.mode === 'play' || G.mode === 'takeoff')){ if (G.aboard || G.mode === 'takeoff') win(); else netEnd('Самолёт улетел без вас: нужно было сесть в него до взлёта.'); }
   else if (m === 'd' && G.mode === 'play') die('Весь экипаж без сознания. Без людей на ногах остров и пираты взяли своё.');
-  else if (m === 'x' && (G.mode === 'play' || G.mode === 'takeoff')) netEnd('Хозяин острова вышел из игры. Остров закрыт, ваша сумка сохранена: при следующем входе на этот остров она вернётся.');
+  else if (m === 'x' && (G.mode === 'play' || G.mode === 'takeoff')){ if (netPromote()) return; netEnd('Хозяин острова вышел из игры. Остров закрыт, ваша сумка сохранена: при следующем входе на этот остров она вернётся.');}
 }
 function netGuestTakeoff(hd){
   closePanel(); if (G.build) exitBuild();
@@ -6226,11 +6233,13 @@ function netGuestEvent(e){
 }
 function netGuestMain(ps){
   if (DIFF[ps.df]) NET.diff = ps.df;
+  NET.epoch = ps.ep | 0;
   NET.slots = new Map(); NET.slots.set(NET.hostPeer, 0);
   for (const e of Array.isArray(ps.pl) ? ps.pl : []) if (Array.isArray(e) && typeof e[0] === 'string') NET.slots.set(e[0], clamp(e[1] | 0, 1, NET_MAX - 1));
   NET.admitted = NET.slots.has(NET.me);
   if (NET.admitted) NET.slot = NET.slots.get(NET.me);
   netGuestHeader(ps.hd);
+  if (NET.role !== 'guest') return;   // the host left and we took the island over
   netGuestSnap(ps.s);
   if (NET.stage === 'play') netGuestLedgers(ps);
   netGuestEvents(ps.ev);
@@ -6322,9 +6331,9 @@ function netGuestStart(){
   cv.focus({ preventScroll:true });
 }
 // a guest's bag belongs to the island: when the host opens the same island again, even under a new code, the bag comes back
-const netProfKey = () => COOP_PROF + (NET.isl || NET.code);
-function netSaveGuest(){
-  if (NET.role !== 'guest' || NET.stage !== 'play' || !NET.code || G.mode !== 'play') return;
+const netProfKey = () => COOP_PROF + (NET.role === 'host' ? (G.isl || NET.code) : (NET.isl || NET.code));
+function netSaveGuest(force){
+  if ((NET.role !== 'guest' && !force) || NET.stage !== 'play' || !NET.code || G.mode !== 'play') return;
   try {
     localStorage.setItem(netProfKey(), JSON.stringify({ t:Date.now(), inv,
       p:{ x:player.x, y:player.y, hp:player.down ? 20 : player.hp, food:player.food, water:player.water, energy:player.energy, warm:player.warm },
@@ -6344,7 +6353,8 @@ function netPruneProfiles(){
 }
 function netGuestTick(now){
   const peers = NET.rm ? NET.rm.peers() : [];
-  const hp = peers.find(p => !p.sameTab && p.presence && p.presence.v === NET_V && p.presence.h === 1 && typeof p.presence.c === 'string' && (p.presence.c === NET.code || NET.code === '*'));
+  let hp = null;
+  for (const p of peers){ if (!p.sameTab && p.presence && p.presence.v === NET_V && p.presence.h === 1 && typeof p.presence.c === 'string' && (p.presence.c === NET.code || NET.code === '*') && (!hp || (p.presence.ep | 0) > (hp.presence.ep | 0))) hp = p; }
   if (hp && NET.code === '*') NET.code = hp.presence.c;
   if (hp){
     NET.hostPeer = hp.peer; NET.hostBy = hp.by; NET.hostSeenAt = now;
@@ -6358,7 +6368,7 @@ function netGuestTick(now){
   if (NET.stage === 'wait'){ netGuestWaitTick(now); if (NET.role !== 'guest') return; }
   else if (NET.stage === 'play' && (G.mode === 'play' || G.mode === 'takeoff') && now - NET.hostSeenAt > 6000){
     if (NET.sapi && NET.sapi.online && !NET.sapi.online()){ if (now - NET.hostSeenAt > 25000){ netEnd('Связь потеряна: проверьте интернет или Wi‑Fi на телефоне. Ваша сумка сохранена, на этот остров можно вернуться.'); return; } }
-    else { netEnd('Хозяин острова пропал из игры. Остров закрыт, ваша сумка сохранена.'); return; }
+    else { if (netPromote()) return; netEnd('Хозяин острова пропал из игры. Остров закрыт, ваша сумка сохранена.'); return; }
   }
   if (now - NET.sendT >= (NET.transport === 'net' ? 100 : 70)){ NET.sendT = now; netGuestSend(now); }
   if (now - NET.profT > 15000){ NET.profT = now; netSaveGuest(); }
@@ -6681,6 +6691,26 @@ function netGiveBtn(){
   NET.giveNear = m;
   if (!m){ if (!el.hidden) el.hidden = true; return; }
   el.hidden = false;
+}
+
+// the host is gone: the crewmate becomes the host of the same island under the same code, and the old host may come back as a guest
+function netPromote(){
+  if (NET.role !== 'guest' || NET.stage !== 'play' || G.mode !== 'play' || NET.transport === 'lan' || !NET.rm || !NET.rw || !NET.admitted) return false;
+  netSaveGuest();
+  NET.role = 'host'; NET.slot = 0; NET.epoch = (NET.epoch | 0) + 1;
+  NET.mates = new Map(); NET.slots = new Map(); NET.pmap = new Map(); NET.bmap = new Map(); NET.giveTo = null;
+  NET.grants = {}; NET.dmg = {}; NET.rev = {}; NET.events = []; NET.evSeq = 0; NET.ops = []; NET.pend = {};
+  NET.hostMain = null; NET.hostWorld = null; NET.hostPeer = ''; NET.hostCockpit = false; NET.passengers = 0;
+  NET.lastOpen = ''; NET.lastW = ''; NET.closing = 0; NET.sendT = 0; NET.sendWT = 0; NET.lobbyT = 0; NET.shrink = 0; NET.k = 1;
+  pirates = []; boars = []; bullets = []; balls = []; G.raid = null;
+  G.isl = NET.isl || G.isl || Math.random().toString(36).slice(2, 10);
+  G.rollDay = G.day;
+  spawnBoars(6, true);
+  netHostInitWorld();
+  closePanel();
+  updateHUD();
+  toast('Хозяин вышел. Теперь остров ведёте вы. Друг может вернуться по коду ' + NET.code.toUpperCase(), 'good');
+  return true;
 }
 
 /* ================= Boot ================= */
