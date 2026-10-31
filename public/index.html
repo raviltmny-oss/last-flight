@@ -307,6 +307,13 @@ body.touch #sleepFx .kbtxt,body:not(.touch) #sleepFx .tchtxt{display:none}
 .card.menu .ach.on{opacity:1;background:rgba(242,162,46,.35);border-color:#9a3d1c}
 .card.menu .ach b{font-family:'Caveat',cursive;font-weight:700;font-size:21px;color:#1c2a33}
 .card.menu .ach i{color:#b5560f}
+.card.menu .mbtn[aria-pressed="true"]{background:rgba(242,162,46,.55)}
+.card.menu .mbtn[aria-pressed="true"]::before{content:"✓ ";font-family:var(--fb)}
+.card.menu .mbtn:disabled{opacity:.45;cursor:default}
+.card.menu .daily{border:2px dashed #9a3d1c;border-radius:12px 16px 11px 15px;padding:10px 12px;display:grid;gap:4px;background:rgba(154,61,28,.08)}
+.card.menu .daily b{font-family:'Caveat',cursive;font-size:24px;font-weight:700;color:#9a3d1c;line-height:1}
+.card.menu .daily span{font-family:'Caveat',cursive;font-size:19px;font-weight:600;color:#223f6b;line-height:1.1}
+.card.menu .rankline{font-family:'Caveat',cursive;font-size:24px;font-weight:700;color:#1c2a33}
 .mbtn.yel{background:#ffd60a;color:#2a2200;border-color:transparent;font-weight:700;box-shadow:0 0 0 2px rgba(255,214,10,.35),0 0 18px rgba(255,214,10,.45)}
 .mbtn.yel:hover{filter:brightness(1.06)}
 #giveBtn{position:fixed;right:calc(24px + env(safe-area-inset-right,0px));bottom:calc(var(--dockH) + 124px + env(safe-area-inset-bottom,0px));width:64px;height:64px;border-radius:50%;border:2px solid rgba(255,255,255,.5);background:rgba(255,214,10,.95);color:#2a2200;font-family:var(--fd);font-size:9.5px;letter-spacing:0;padding:0;touch-action:none;box-shadow:0 0 14px rgba(255,214,10,.5)}
@@ -755,7 +762,7 @@ function loadSettings(){
   try { const d = JSON.parse(localStorage.getItem(SET_KEY) || '{}'); if (DIFF[d.diff]) SETTINGS.diff = d.diff; if (d.sound === 0 || d.sound === 1 || d.sound === 2) SETTINGS.sound = d.sound; if (QUALITY_NAMES[d.quality]) SETTINGS.quality = d.quality; if (typeof d.hints === 'boolean') SETTINGS.hints = d.hints; if (INTRO_NAMES[d.intro]) SETTINGS.intro = d.intro; if (typeof d.name === 'string') SETTINGS.name = d.name.slice(0, 16); } catch (e) {}
 }
 function saveSettings(){ try { localStorage.setItem(SET_KEY, JSON.stringify(SETTINGS)); } catch (e) {} }
-const diff = () => DIFF[(NET.role !== 'solo' && NET.diff) || SETTINGS.diff] || DIFF.normal;   // a guest plays on the host's difficulty
+const diff = () => chalDiff(DIFF[(NET.role !== 'solo' && NET.diff) || SETTINGS.diff] || DIFF.normal);   // a guest plays on the host's difficulty; challenges bend it
 
 /* ================= State ================= */
 let rng = mulberry32(1);
@@ -1279,7 +1286,7 @@ function saveGame(){
     const data = {
       v:3, objects, inv,
       player:{ x:player.x, y:player.y, dir:player.dir, hp:player.hp, food:player.food, water:player.water, energy:player.energy, warm:player.warm, poison:player.poison },
-      G:{ clock:G.clock, day:G.day, time:G.time, repairs:G.repairs, crate:G.crate, gathered:G.gathered, raidDay:G.raidDay, kills:G.kills, stats:G.stats, boars:boars.map(b => ({ x:Math.round(b.x), y:Math.round(b.y), hp:b.hp })), raidPlanned:G.raidPlanned, rollDay:G.rollDay, raidSpot:G.raidSpot, raidAt:G.raidAt || 0, isl:G.isl || '', preflight:!!G.preflight, htorchT:G.htorchT || 0, exp:expEncode(),
+      G:{ clock:G.clock, day:G.day, time:G.time, repairs:G.repairs, crate:G.crate, gathered:G.gathered, raidDay:G.raidDay, kills:G.kills, stats:G.stats, boars:boars.map(b => ({ x:Math.round(b.x), y:Math.round(b.y), hp:b.hp })), raidPlanned:G.raidPlanned, rollDay:G.rollDay, raidSpot:G.raidSpot, raidAt:G.raidAt || 0, isl:G.isl || '', mods:G.mods || [], cd:G.chalDaily || 0, preflight:!!G.preflight, htorchT:G.htorchT || 0, exp:expEncode(),
         // an active raid survives saving: closing the app or locking the phone no longer makes the pirates vanish
         raid: G.raid ? { boat:G.raid.boat, landX:G.raid.landX, landY:G.raid.landY, ending:G.raid.ending, endT:G.raid.endT, warnedSab:G.raid.warnedSab, boatHp:G.raid.boatHp, sunk:G.raid.sunk || G.raid.burn > 0 } : null,
         pirates: G.raid ? pirates.filter(q => !q.dead && !q.gone).map(q => ({ kind:q.kind, x:q.x, y:q.y, hp:q.hp, max:q.max, raider:q.raider, loot:q.loot, flee:!!q.flee, seed:q.seed })) : null }
@@ -1955,6 +1962,7 @@ function resetGame(){
   G.clock = 0.3125; G.day = 1; G.time = 0; G.repairs = {}; G.crate = false; G.campfire = null; G.workbench = null;
   G.gathered = 0; G.raidDay = 0; G.kills = 0; G.raidPlanned = false; G.rollDay = 1; G.raidSpot = null; G.raidAt = 0; G.stats = {};
   G.isl = Math.random().toString(36).slice(2, 10);
+  G.mods = chalTake(); G.chalDaily = CH.daily; CH.daily = 0;
   resetCommon();
   boars = []; spawnBoars(6, false);
   EXP.fill(0); fogDirty = true; explore(player.x, player.y, 420);
@@ -1970,6 +1978,7 @@ function restoreGame(d){
   G.repairs = d.G.repairs || {}; G.crate = !!d.G.crate; G.gathered = d.G.gathered || 0; G.raidDay = d.G.raidDay || 0; G.kills = d.G.kills || 0;
   G.stats = d.G.stats && typeof d.G.stats === 'object' ? d.G.stats : {};
   G.isl = typeof d.G.isl === 'string' && /^[a-z0-9]{1,12}$/.test(d.G.isl) ? d.G.isl : Math.random().toString(36).slice(2, 10);
+  G.mods = Array.isArray(d.G.mods) ? d.G.mods.filter(x => MODS[x]) : []; G.chalDaily = isFinite(d.G.cd) ? d.G.cd : 0;
   boars = [];
   if (Array.isArray(d.G.boars)){ for (const q of d.G.boars) if (q && isFinite(q.x) && isFinite(q.y) && walkable(q.x, q.y) && q.hp > 0) boars.push({ type:'boar', id:++NET.eid, x:q.x, y:q.y, dir:rnd()*TAU, hp:Math.min(BOAR.hp, q.hp), angry:0, atkT:0, flash:0, walkT:0, moving:false, think:rnd()*3, mode:'graze', seed:rnd() }); }
   else spawnBoars(6, false);
@@ -2062,6 +2071,7 @@ function showMenu(view){
       <nav class="mlist" aria-label="Главное меню">
         ${sv ? `<button class="mbtn primary" type="button" data-m="continue">Продолжить <small>${saveSummary(sv)}</small></button>` : ''}
         <button class="mbtn${sv ? '' : ' primary'}" type="button" data-m="new">Новая игра <small>${diff().name.toLowerCase()} сложность</small></button>
+        ${chalButton()}
         ${coopButton()}
         ${ANDROID_WEB ? '<a class="mbtn" href="download/">Скачать приложение <small>для Android</small></a>' : ''}
         <button class="mbtn" type="button" data-m="records">Рекорды и достижения <small>${ACH.filter(a => REC.ach[a.id]).length}/${ACH.length}</small></button>
@@ -2110,7 +2120,7 @@ function showMenu(view){
       <p>Текущее сохранение (${saveSummary(sv)}) будет удалено.</p>
       <nav class="mlist"><button class="mbtn danger" type="button" data-m="new-yes">Да, начать заново</button><button class="mbtn" type="button" data-m="back">Отмена <small>Esc</small></button></nav>
     </div>`;
-  } else if (view === 'coop' || view === 'coop-info' || view === 'confirm-coop'){
+  } else if (view === 'coop' || view === 'coop-info' || view === 'confirm-coop' || view === 'chal'){
     h = netMenuHTML(view);
   } else if (view === 'confirm-wipe'){
     h = `<div class="card menu">
@@ -2154,7 +2164,7 @@ function menuBack(){
   if (v === 'pause') resumeGame();
   else if (v === 'help' || v === 'settings' || v === 'confirm-new' || v === 'records') showMenu(menuCtx);
   else if (v === 'confirm-wipe') showMenu('settings');
-  else if (v === 'coop' || v === 'coop-info' || v === 'coop-msg') showMenu('main');
+  else if (v === 'coop' || v === 'coop-info' || v === 'coop-msg' || v === 'chal') showMenu('main');
   else if (v === 'confirm-coop') showMenu('coop');
   else if (v === 'coop-wait') netCancelWait();
 }
@@ -2189,6 +2199,7 @@ screenEl.addEventListener('click', e => {
     case 'fs': toggleFullscreen(); break;
     case 'wipe-yes': clearSave(); showMenu('main'); break;
     case 'coop': showMenu(netRelayAvail() ? 'coop' : 'coop-info'); break;
+    case 'chal': showMenu('chal'); break;
     case 'host-new': NET.hostTr = 'claude'; if (loadSave()) showMenu('confirm-coop'); else netHostStart(null, 'claude'); break;
     case 'host-yes': netHostStart(null, NET.hostTr || 'claude'); break;
     case 'host-save': netHostStart(loadSave(), 'claude'); break;
@@ -2272,7 +2283,7 @@ const ACH = [
   { id:'hard', name:'Морской волк', desc:'Улететь на сложной сложности' }
 ];
 function loadRecords(){
-  const d = { games:0, wins:0, deaths:0, fastestDays:0, fastestTime:0, mostKills:0, longest:0, totalKills:0, ach:{} };
+  const d = { games:0, wins:0, deaths:0, fastestDays:0, fastestTime:0, mostKills:0, longest:0, totalKills:0, stars:0, streak:0, bestStreak:0, dailyDay:0, chalWins:0, ach:{} };
   try { const r = JSON.parse(localStorage.getItem(REC_KEY) || '{}'); for (const k in d) if (k === 'ach' ? r.ach && typeof r.ach === 'object' : isFinite(r[k])) d[k] = r[k]; } catch (e) {}
   return d;
 }
@@ -2299,6 +2310,7 @@ function recordEnd(won){
     const t = Math.round(G.time);
     if (!REC.fastestDays || G.day < REC.fastestDays || (G.day === REC.fastestDays && t < REC.fastestTime)){ if (REC.fastestDays) lines.unshift('Быстрее всего улетели: день ' + G.day); REC.fastestDays = G.day; REC.fastestTime = t; }
   } else REC.deaths++;
+  chalEnd(won);
   saveRecords();
   return lines;
 }
@@ -2306,6 +2318,7 @@ function recordsHTML(){
   const n = ACH.filter(a => REC.ach[a.id]).length, mm = s => Math.floor(s/60) + ':' + String(s%60).padStart(2, '0');
   return `<div class="card menu wide">
     <div class="eyebrow">РЕКОРДЫ И ДОСТИЖЕНИЯ</div>
+    ${chalRankHTML()}
     <div class="tally rec">
       <div><b>${REC.wins}</b><span>раз улетели</span></div>
       <div><b>${REC.fastestDays ? 'день ' + REC.fastestDays : '—'}</b><span>самый быстрый побег${REC.fastestDays ? ', ' + mm(REC.fastestTime) : ''}</span></div>
@@ -2336,6 +2349,7 @@ function die(cause){
     <p>${cause}</p>
     <div class="tally"><div><b>${G.day}</b><span>дней на острове</span></div><div><b>${done}/${REPAIRS.length}</b><span>систем исправлено</span></div><div><b>${G.kills}</b><span>пиратов отбито</span></div></div>
     ${best.length ? `<p class="newrec">Новый рекорд! ${best.join(' · ')}</p>` : ''}
+    ${chalWinHTML()}
     <div class="btns"><button class="big" id="againBtn" type="button">${NET.role !== 'solo' ? 'К совместной игре' : 'Начать заново'}</button><button class="big ghost" id="menuBackBtn" type="button">В меню</button></div>
   </div>`);
   { const coop = NET.role !== 'solo';
@@ -2358,6 +2372,7 @@ function win(){
     <p>Мотор тянет ровно, остров уменьшается под крылом. Заплатки держат, а кокосовое масло, как ни странно, тоже. Пиратские огни остаются позади. Курс на материк.</p>
     <div class="tally"><div><b>${G.day}</b><span>дней на острове</span></div><div><b>${m}:${String(s).padStart(2,'0')}</b><span>минут игры</span></div><div><b>${G.kills}</b><span>пиратов отбито</span></div></div>
     ${best.length ? `<p class="newrec">Новый рекорд! ${best.join(' · ')}</p>` : ''}
+    ${chalWinHTML()}
     <div class="btns"><button class="big" id="againBtn" type="button">${NET.role !== 'solo' ? 'К совместной игре' : 'Сыграть ещё раз'}</button><button class="big ghost" id="menuBackBtn" type="button">В меню</button></div>
   </div>`);
   { const coop = NET.role !== 'solo';
@@ -6567,6 +6582,7 @@ function netHostChoice(tr){
 }
 function netMenuHTML(view){
   const sv = loadSave();
+  if (view === 'chal') return chalMenuHTML();
   if (view === 'coop') return netRelayMenuHTML();   // everywhere, Claude included: Wi-Fi (in the app) and the internet
   if (view === 'coop-info') return `<div class="card menu">
       <div class="eyebrow">ИГРАТЬ ВМЕСТЕ</div>
@@ -6838,6 +6854,120 @@ function tutTick(){
     if (b.dataset.tut === 'skip') tutDone(); else tutNext();
   });
   setInterval(() => { try { tutTick(); } catch (e) {} }, 300);
+})();
+
+/* ---------- challenges: a reason to play again ---------- */
+const MODS = {
+  night:  { name:'Ночные налёты', desc:'Набеги почти каждую ночь, пиратов больше.', raid:0.35, pcount:1 },
+  hunger: { name:'Голодный остров', desc:'Еда и вода тратятся на 40% быстрее.', drain:1.4 },
+  glass:  { name:'Хрупкий герой', desc:'Все удары по вам на 40% больнее.', dmg:1.4 },
+  sprint: { name:'Спринт', desc:'Улететь нужно до конца 6-го дня.', deadline:6 }
+};
+const CH = { pending:[], daily:0, sel:[], cache:null, cacheKey:'', last:null, told:false, lastDay:0 };
+const RANKS = [[0, 'Новичок'], [4, 'Выживший'], [10, 'Следопыт'], [20, 'Капитан'], [40, 'Легенда острова']];
+function chalRank(n){ let r = RANKS[0][1]; for (const x of RANKS) if (n >= x[0]) r = x[1]; return r; }
+function chalNext(n){ for (const x of RANKS) if (n < x[0]) return x; return null; }
+function chalTake(){ const m = CH.pending.filter(x => MODS[x]); CH.pending = []; return m; }
+function chalDiff(b){
+  const m = G.mods;
+  if (!m || !m.length) return b;
+  const key = m.join() + '|' + b.name;
+  if (CH.cacheKey === key && CH.cache) return CH.cache;
+  const o = Object.assign({}, b);
+  for (const id of m){
+    const x = MODS[id]; if (!x) continue;
+    if (x.raid) o.raid = Math.min(0.9, o.raid + x.raid);
+    if (x.pcount) o.pcount += x.pcount;
+    if (x.drain) o.drain *= x.drain;
+    if (x.dmg) o.dmg *= x.dmg;
+  }
+  CH.cacheKey = key; CH.cache = o;
+  return o;
+}
+function chalToday(){ const d = new Date(); return Math.floor(Date.UTC(d.getFullYear(), d.getMonth(), d.getDate())/864e5); }
+function chalDailyMods(){
+  const n = chalToday(), ids = Object.keys(MODS);
+  const a = ids[n % ids.length], b = ids[(n*5 + 2) % ids.length];
+  return (a === b || n % 3 === 0) ? [a] : [a, b];
+}
+function chalNames(ids){ return ids.map(x => MODS[x].name).join(' + '); }
+function chalDailyDone(){ return REC.dailyDay === chalToday(); }
+function chalButton(){
+  CH.pending = []; CH.daily = 0;   // opening the main menu cancels a challenge that was not started
+  const sub = chalDailyDone() ? 'вызов дня пройден' : 'вызов дня ждёт';
+  return `<button class="mbtn" type="button" data-m="chal">Вызовы <small>${sub}</small></button>`;
+}
+function chalRankHTML(){
+  const nx = chalNext(REC.stars | 0);
+  return `<p class="rankline">${chalRank(REC.stars | 0)} · ★ ${REC.stars | 0}${nx ? ' <small style="font-size:18px;color:#6a5a40">до «' + nx[1] + '»: ещё ' + (nx[0] - (REC.stars | 0)) + '</small>' : ''}${REC.bestStreak ? ' · серия дней подряд: ' + (REC.streak | 0) + ' (лучшая ' + REC.bestStreak + ')' : ''}</p>`;
+}
+function chalMenuHTML(){
+  CH.pending = []; CH.daily = 0;
+  const dm = chalDailyMods(), done = chalDailyDone();
+  const sel = CH.sel.filter(x => MODS[x]);
+  return `<div class="card menu">
+      <div class="eyebrow">ВЫЗОВЫ</div>
+      <h1 class="small">Испытайте себя</h1>
+      ${chalRankHTML()}
+      <div class="daily"><b>Вызов дня${done ? ' · пройден ✓' : ''}</b><span>${esc(chalNames(dm))}. ${esc(dm.map(x => MODS[x].desc).join(' '))}</span><span>Награда: ★ ${dm.length + 3} за побег${done ? ' (сегодня уже получена)' : ', серия дней подряд растёт'}.</span></div>
+      <nav class="mlist"><button class="mbtn primary" type="button" data-c="daily">Принять вызов дня</button></nav>
+      <div class="sec">СВОЙ ВЫЗОВ<small>Каждое условие даёт ★ +1 за побег.</small></div>
+      <nav class="mlist">${Object.keys(MODS).map(id => `<button class="mbtn" type="button" data-mod="${id}" aria-pressed="${sel.includes(id)}">${MODS[id].name} <small>${MODS[id].desc}</small></button>`).join('')}
+        <button class="mbtn primary" type="button" data-c="go"${sel.length ? '' : ' disabled'}>Начать с условиями${sel.length ? ' (★ +' + sel.length + ')' : ''}</button>
+        <button class="mbtn" type="button" data-m="back">Назад <small>Esc</small></button></nav>
+      <p class="foot">Вызовы идут в одиночной игре. Вызов дня у всех одинаковый и меняется в полночь.</p>
+    </div>`;
+}
+function chalStart(ids, daily){
+  if (!ids.length) return;
+  CH.pending = ids.slice(); CH.daily = daily ? chalToday() : 0;
+  if (loadSave()) showMenu('confirm-new'); else startGame(null);
+}
+function chalEnd(won){
+  CH.last = null;
+  if (!won) return;
+  const mods = G.mods || [], dayIdx = G.chalDaily | 0;
+  let stars = 1 + mods.length + (G.day <= 7 ? 1 : 0), daily = false;
+  if (dayIdx && dayIdx === chalToday() && REC.dailyDay !== dayIdx){
+    daily = true; stars += 2;
+    REC.streak = REC.dailyDay === dayIdx - 1 ? (REC.streak | 0) + 1 : 1;
+    REC.dailyDay = dayIdx; REC.bestStreak = Math.max(REC.bestStreak | 0, REC.streak);
+  }
+  if (mods.length) REC.chalWins = (REC.chalWins | 0) + 1;
+  const before = chalRank(REC.stars | 0);
+  REC.stars = (REC.stars | 0) + stars;
+  CH.last = { stars, daily, streak:REC.streak | 0, rank:chalRank(REC.stars), up:chalRank(REC.stars) !== before, mods };
+}
+function chalWinHTML(){
+  const l = CH.last; if (!l) return '';
+  return `<p class="newrec">★ +${l.stars}${l.mods.length ? ' · ' + esc(chalNames(l.mods)) : ''}${l.daily ? ' · вызов дня пройден, серия: ' + l.streak : ''} · звание: ${l.rank}${l.up ? ' (новое!)' : ''}</p>`;
+}
+(function chalInit(){
+  screenEl.addEventListener('click', e => {
+    const t = e.target.closest && e.target.closest('[data-mod],[data-c]'); if (!t || t.disabled) return;
+    if (t.dataset.mod){
+      const id = t.dataset.mod, i = CH.sel.indexOf(id);
+      if (i >= 0) CH.sel.splice(i, 1); else CH.sel.push(id);
+      showMenu('chal'); return;
+    }
+    if (t.dataset.c === 'daily') chalStart(chalDailyMods(), true);
+    else if (t.dataset.c === 'go') chalStart(CH.sel.filter(x => MODS[x]), false);
+  });
+  setInterval(() => {
+    try {
+      if (G.mode !== 'play'){ if (G.mode === 'title') CH.told = false; return; }
+      const m = G.mods || [];
+      if (!m.length) return;
+      if (!CH.told){ CH.told = true; CH.lastDay = G.day; toast('Вызов: ' + chalNames(m), 'good'); }
+      if (m.includes('sprint')){
+        if (G.day !== CH.lastDay){
+          CH.lastDay = G.day;
+          if (G.day > MODS.sprint.deadline){ die('Срок вышел: спринт требовал улететь до конца 6-го дня.'); return; }
+          toast('Спринт: осталось дней — ' + (MODS.sprint.deadline - G.day + 1), 'bad');
+        }
+      }
+    } catch (e) {}
+  }, 500);
 })();
 
 /* ================= Boot ================= */
