@@ -233,6 +233,8 @@ body.touch #sleepFx .kbtxt,body:not(.touch) #sleepFx .tchtxt{display:none}
 .gi{width:20px;height:20px;vertical-align:-5px;margin-right:6px}
 .gbtns{display:flex;gap:6px}
 .gbtns .go{min-width:0}
+.mbtn.yel{background:#ffd60a;color:#2a2200;border-color:transparent;font-weight:700;box-shadow:0 0 0 2px rgba(255,214,10,.35),0 0 18px rgba(255,214,10,.45)}
+.mbtn.yel:hover{filter:brightness(1.06)}
 #islCode{position:fixed;top:calc(10px + env(safe-area-inset-top,0px));left:50%;transform:translateX(-50%);z-index:6;display:grid;justify-items:center;gap:1px;padding:6px 16px 7px;border-radius:12px;background:rgba(40,6,6,.82);border:2px solid #ff3b2b;pointer-events:none;animation:islGlow 1.6s ease-in-out infinite;white-space:nowrap}
 #islCode span{font-size:10px;letter-spacing:.2em;font-weight:700;color:#ffb3aa}
 #islCode b{font-family:var(--fd);font-weight:400;font-size:26px;line-height:1;letter-spacing:.14em;color:#ff4a3a;text-shadow:0 0 6px rgba(255,59,43,.9),0 0 18px rgba(255,59,43,.7)}
@@ -6441,7 +6443,7 @@ function netLanListHTML(){
 }
 function netRefreshLan(){ const el = $('lanList'); if (el){ const h = netLanListHTML(); if (el.innerHTML !== h) el.innerHTML = h; } }
 function netRelayMenuHTML(){
-  const sv = loadSave(), lan = !!window.LFLan;
+  const sv = loadSave(), lan = false;   // Wi-Fi button removed from the menu: the game together goes through the internet
   const which = sv ? (NET.hostWhich || 'save') : 'new';
   return `<div class="card menu">
       <div class="eyebrow">ИГРАТЬ ВМЕСТЕ · ВДВОЁМ</div>
@@ -6456,7 +6458,7 @@ function netRelayMenuHTML(){
       ${sv ? `<div class="seg hw"><button type="button" data-hw="save" aria-pressed="${which === 'save'}">Сохранённый: ${saveSummary(sv)}</button><button type="button" data-hw="new" aria-pressed="${which === 'new'}">Новый</button></div>` : ''}
       <nav class="mlist">
         ${lan ? '<button class="mbtn primary" type="button" data-m="host-lan">Открыть по Wi‑Fi</button>' : ''}
-        <button class="mbtn${lan ? '' : ' primary'}" type="button" data-m="host-net">Открыть через интернет</button>
+        <button class="mbtn yel" type="button" data-m="host-net">Открыть через интернет</button>
         <button class="mbtn" type="button" data-m="back">Назад <small>Esc</small></button>
       </nav>
       <p class="foot">${lan ? 'По Wi‑Fi друг увидит ваш остров в списке «Рядом». ' : ''}Через интернет назовите другу код из пяти знаков: он появится после открытия острова и есть в меню (☰). Остров ведёт телефон того, кто его открыл: не сворачивайте игру надолго.</p>
