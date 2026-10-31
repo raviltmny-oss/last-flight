@@ -235,6 +235,9 @@ body.touch #sleepFx .kbtxt,body:not(.touch) #sleepFx .tchtxt{display:none}
 .gbtns .go{min-width:0}
 .mbtn.yel{background:#ffd60a;color:#2a2200;border-color:transparent;font-weight:700;box-shadow:0 0 0 2px rgba(255,214,10,.35),0 0 18px rgba(255,214,10,.45)}
 .mbtn.yel:hover{filter:brightness(1.06)}
+#giveBtn{position:fixed;right:calc(24px + env(safe-area-inset-right,0px));bottom:calc(var(--dockH) + 124px + env(safe-area-inset-bottom,0px));width:64px;height:64px;border-radius:50%;border:2px solid rgba(255,255,255,.5);background:rgba(255,214,10,.95);color:#2a2200;font-family:var(--fd);font-size:9.5px;letter-spacing:0;padding:0;touch-action:none;box-shadow:0 0 14px rgba(255,214,10,.5)}
+#giveBtn:active{transform:scale(.94)}
+@media (max-width:900px){#giveBtn{bottom:calc(100px + env(safe-area-inset-bottom,0px));right:calc(20px + env(safe-area-inset-right,0px))}}
 #islCode{position:fixed;top:calc(10px + env(safe-area-inset-top,0px));left:50%;transform:translateX(-50%);z-index:6;display:grid;justify-items:center;gap:1px;padding:6px 16px 7px;border-radius:12px;background:rgba(40,6,6,.82);border:2px solid #ff3b2b;pointer-events:none;animation:islGlow 1.6s ease-in-out infinite;white-space:nowrap}
 #islCode span{font-size:10px;letter-spacing:.2em;font-weight:700;color:#ffb3aa}
 #islCode b{font-family:var(--fd);font-weight:400;font-size:26px;line-height:1;letter-spacing:.14em;color:#ff4a3a;text-shadow:0 0 6px rgba(255,59,43,.9),0 0 18px rgba(255,59,43,.7)}
@@ -393,7 +396,7 @@ body.touch #intro .kbtxt,body:not(.touch) #intro .tchtxt{display:none}
   <div id="touch" hidden>
     <div id="joyBase" hidden><div id="joyKnob"></div></div>
     <button id="dodgeBtn" type="button">РЫВОК</button>
-    <button id="actBtn" type="button">ДЕЙСТВИЕ</button>
+    <button id="actBtn" type="button">ДЕЙСТВИЕ</button><button id="giveBtn" type="button" hidden>ПЕРЕДАТЬ</button>
   </div>
 </div>
 
@@ -1292,6 +1295,7 @@ function updateHUD(){
   if (w !== lastWarn){ const we = $('warn'); we.hidden = !w; we.textContent = w; lastWarn = w; }
   updateInventory();
   netCodeBadge();
+  netGiveBtn();
   const ab = $('actBtn');
   const fight = !!(G.target && G.target.action && G.target.action.attack);
   ab.classList.toggle('fight', fight);
@@ -5047,6 +5051,7 @@ const endJoy = e => { if (joy.active && e.pointerId === joy.id) joyEnd(); };
 cv.addEventListener('pointerup', endJoy);
 cv.addEventListener('pointercancel', endJoy);
 $('actBtn').addEventListener('pointerdown', e => { e.preventDefault(); pressAction(); });
+$('giveBtn').addEventListener('pointerdown', e => { e.preventDefault(); if (NET.giveNear){ NET.giveTo = NET.giveNear; openPanel('give'); } });
 $('dodgeBtn').addEventListener('pointerdown', e => { e.preventDefault(); tryDash(); });
 $('craftBtn').addEventListener('click', () => { if (G.mode === 'play') openPanel('craft'); });
 $('buildBtn').addEventListener('click', () => { if (G.mode === 'play') openPanel('build'); });
@@ -6662,6 +6667,19 @@ function netCodeBadge(){
   if ($('islCodeVal').textContent !== val) $('islCodeVal').textContent = val;
   if ($('islCodeLbl').textContent !== lbl) $('islCodeLbl').textContent = lbl;
   el.classList.toggle('ip', lan);
+  el.hidden = false;
+}
+
+// a round «ПЕРЕДАТЬ» button above the action button whenever the crewmate is within reach, whatever else is nearby
+function netGiveBtn(){
+  const el = $('giveBtn'); if (!el) return;
+  let m = null;
+  if (NET.role !== 'solo' && NET.stage === 'play' && G.mode === 'play' && !panelKind){
+    let md = 120;
+    for (const x of NET.mates.values()){ if (!x.playing || (x.f & (F_HID | F_DOWN))) continue; const d = dist(player.x, player.y, x.rx, x.ry); if (d < md){ md = d; m = x; } }
+  }
+  NET.giveNear = m;
+  if (!m){ if (!el.hidden) el.hidden = true; return; }
   el.hidden = false;
 }
 
