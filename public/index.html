@@ -233,6 +233,14 @@ body.touch #sleepFx .kbtxt,body:not(.touch) #sleepFx .tchtxt{display:none}
 .gi{width:20px;height:20px;vertical-align:-5px;margin-right:6px}
 .gbtns{display:flex;gap:6px}
 .gbtns .go{min-width:0}
+#islCode{position:fixed;top:calc(10px + env(safe-area-inset-top,0px));left:50%;transform:translateX(-50%);z-index:6;display:grid;justify-items:center;gap:1px;padding:6px 16px 7px;border-radius:12px;background:rgba(40,6,6,.82);border:2px solid #ff3b2b;pointer-events:none;animation:islGlow 1.6s ease-in-out infinite;white-space:nowrap}
+#islCode span{font-size:10px;letter-spacing:.2em;font-weight:700;color:#ffb3aa}
+#islCode b{font-family:var(--fd);font-weight:400;font-size:26px;line-height:1;letter-spacing:.14em;color:#ff4a3a;text-shadow:0 0 6px rgba(255,59,43,.9),0 0 18px rgba(255,59,43,.7)}
+#islCode.ip b{font-size:20px;letter-spacing:.04em}
+@keyframes islGlow{0%,100%{box-shadow:0 0 8px rgba(255,59,43,.55),0 0 22px rgba(255,59,43,.3)}50%{box-shadow:0 0 16px rgba(255,59,43,.95),0 0 40px rgba(255,59,43,.6)}}
+@media (prefers-reduced-motion:reduce){#islCode{animation:none;box-shadow:0 0 14px rgba(255,59,43,.8)}}
+@media (max-width:640px){#islCode{padding:4px 10px 5px}#islCode b{font-size:20px}#islCode span{font-size:9px}body.hascode .lt,body.hascode .side{top:calc(64px + env(safe-area-inset-top,0px))}}
+@media (max-height:520px) and (orientation:landscape){#islCode{padding:4px 12px 5px}#islCode b{font-size:20px}#islCode span{font-size:9px}}
 a.mbtn{text-decoration:none;box-sizing:border-box}
 .codein input.wide{width:auto;flex:1;min-width:0;font-family:var(--fb);font-size:16px;letter-spacing:0;text-transform:none;text-align:left}
 .namein{align-items:center}
@@ -345,6 +353,7 @@ body.touch #intro .kbtxt,body:not(.touch) #intro .tchtxt{display:none}
 <canvas id="game" tabindex="0" aria-label="Игровое поле: остров"></canvas>
 
 <div id="hud" hidden>
+  <div id="islCode" hidden aria-live="polite"><span id="islCodeLbl">КОД ОСТРОВА</span><b id="islCodeVal"></b></div>
   <div id="sleepFx" hidden><div><b id="sleepLbl">Сон</b><span id="sleepSub" hidden></span><span class="kbtxt wk">Нажмите любую клавишу, чтобы проснуться</span><span class="tchtxt wk">Коснитесь экрана, чтобы проснуться</span></div></div>
   <div class="lt">
   <div class="stats" id="stats">
@@ -1280,6 +1289,7 @@ function updateHUD(){
   const w = warning();
   if (w !== lastWarn){ const we = $('warn'); we.hidden = !w; we.textContent = w; lastWarn = w; }
   updateInventory();
+  netCodeBadge();
   const ab = $('actBtn');
   const fight = !!(G.target && G.target.action && G.target.action.attack);
   ab.classList.toggle('fight', fight);
@@ -6638,6 +6648,20 @@ setInterval(() => {
 // a text field on a phone: lift it above the on-screen keyboard
 screenEl.addEventListener('focusin', e => { if (e.target && e.target.tagName === 'INPUT') setTimeout(() => { try { e.target.scrollIntoView({ block:'start', behavior:'smooth' }); } catch (x) {} }, 300); });
 screenEl.addEventListener('input', e => { if (e.target && e.target.id === 'coopName'){ SETTINGS.name = cleanName(e.target.value).slice(0, 16); saveSettings(); } });
+
+// the island's code at the top of the screen, so the host can read it out and a guest can check it
+function netCodeBadge(){
+  const el = $('islCode'); if (!el) return;
+  const lan = NET.transport === 'lan';
+  const show = NET.role !== 'solo' && NET.stage === 'play' && G.mode === 'play' && (lan ? NET.role === 'host' && NET.lanIps && NET.lanIps.length : /^[a-z0-9]{4,5}$/.test(NET.code));
+  document.body.classList.toggle('hascode', !!show);   // on a narrow phone the panels step down below the code
+  if (!show){ if (!el.hidden) el.hidden = true; return; }
+  const val = lan ? NET.lanIps[0] : NET.code.toUpperCase(), lbl = lan ? 'АДРЕС ДЛЯ ДРУГА' : 'КОД ОСТРОВА';
+  if ($('islCodeVal').textContent !== val) $('islCodeVal').textContent = val;
+  if ($('islCodeLbl').textContent !== lbl) $('islCodeLbl').textContent = lbl;
+  el.classList.toggle('ip', lan);
+  el.hidden = false;
+}
 
 /* ================= Boot ================= */
 loadSettings();

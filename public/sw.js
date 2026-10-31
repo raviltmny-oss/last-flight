@@ -1,5 +1,5 @@
 // Offline cache for "Последний рейс"
-const CACHE = 'last-flight-29b0c5cdad';
+const CACHE = 'last-flight-626b4579e6';
 const FILES = ["./", "index.html", "manifest.webmanifest", "icons/apple-touch-icon.png", "icons/favicon-64.png", "icons/icon-192.png", "icons/icon-512-maskable.png", "icons/icon-512.png", "fonts/rubik-cyrillic-400-normal.woff2", "fonts/rubik-cyrillic-500-normal.woff2", "fonts/rubik-cyrillic-700-normal.woff2", "fonts/rubik-latin-400-normal.woff2", "fonts/rubik-latin-500-normal.woff2", "fonts/rubik-latin-700-normal.woff2", "fonts/russo-one-cyrillic-400-normal.woff2", "fonts/russo-one-latin-400-normal.woff2"];
 self.addEventListener('install', e => {
   e.waitUntil(caches.open(CACHE).then(c => c.addAll(FILES)).then(() => self.skipWaiting()));
