@@ -238,43 +238,75 @@ body.touch #sleepFx .kbtxt,body:not(.touch) #sleepFx .tchtxt{display:none}
 .gbtns{display:flex;gap:6px}
 .gbtns .go{min-width:0}
 
-.screen:has(.menu.main){background:radial-gradient(ellipse at 50% 40%,rgba(8,24,32,.12),rgba(4,12,18,.7))}
-.card.menu.main{position:relative;width:min(430px,100%);padding:28px 26px 22px;color:#2b2318;border-radius:3px 8px 4px 10px;transform:rotate(-.6deg);
+.screen:has(.card.menu){background:radial-gradient(ellipse at 50% 40%,rgba(8,24,32,.12),rgba(4,12,18,.7))}
+.card.menu{--paper:#2b2318;--muted:#6a5a40;--line:rgba(43,35,24,.4);--accent:#b5560f;position:relative;width:min(430px,100%);padding:28px 26px 22px;color:#2b2318;border-radius:3px 8px 4px 10px;transform:rotate(-.6deg);
   background:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='220' height='220'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' seed='4'/><feColorMatrix values='0 0 0 0 .35  0 0 0 0 .25  0 0 0 0 .1  0 0 0 .22 0'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>"),repeating-linear-gradient(transparent 0 29px,rgba(70,100,140,.14) 29px 30px),linear-gradient(172deg,#f1e7cb,#e7d8b3);
   box-shadow:0 1px 0 rgba(255,255,255,.4) inset,0 2px 1px rgba(0,0,0,.25),0 22px 40px rgba(0,0,0,.55),inset 0 0 70px rgba(130,90,35,.22);animation:jIn .55s cubic-bezier(.2,.9,.25,1.1) both}
-.card.menu.main::before,.card.menu.main::after{content:"";position:absolute;width:84px;height:24px;background:rgba(236,216,142,.72);box-shadow:0 1px 2px rgba(0,0,0,.25);top:-11px}
-.card.menu.main::before{left:22px;transform:rotate(-5deg)}
-.card.menu.main::after{right:26px;transform:rotate(3.5deg);width:70px}
+.card.menu::before,.card.menu::after{content:"";position:absolute;width:84px;height:24px;background:rgba(236,216,142,.72);box-shadow:0 1px 2px rgba(0,0,0,.25);top:-11px}
+.card.menu::before{left:22px;transform:rotate(-5deg)}
+.card.menu::after{right:26px;transform:rotate(3.5deg);width:70px}
 .jfx{position:absolute;inset:0;pointer-events:none;overflow:hidden;border-radius:inherit}
 .jfx .ring{position:absolute;right:-22px;bottom:34px;width:96px;height:96px;border-radius:50%;border:5px solid rgba(110,70,30,.16);box-shadow:inset 0 0 6px rgba(110,70,30,.12);transform:scale(1,.93) rotate(20deg);clip-path:polygon(0 0,100% 0,100% 82%,70% 100%,0 100%)}
 .jfx svg{position:absolute;right:14px;top:14px;width:104px;height:62px;opacity:.85}
-.menu.main .eyebrow{max-width:calc(100% - 100px);font-family:'Caveat',cursive;font-size:21px;letter-spacing:.02em;font-weight:600;color:#9a3d1c;transform:rotate(-1deg);transform-origin:left}
-.menu.main h1{font-family:var(--fd);color:#1c2a33;text-shadow:1.5px 1px 0 rgba(0,0,0,.16);transform:rotate(-1.4deg);transform-origin:left;display:inline-block;justify-self:start;padding-bottom:12px;background:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 300 14' preserveAspectRatio='none'><path d='M3 8 C40 3 80 11 120 6 S200 9 240 5 S285 8 297 6' fill='none' stroke='%23f2a22e' stroke-width='5' stroke-linecap='round' opacity='.85'/><path d='M10 11 C70 8 150 12 280 9' fill='none' stroke='%23f2a22e' stroke-width='2' stroke-linecap='round' opacity='.6'/></svg>") left bottom/100% 13px no-repeat;font-size:clamp(34px,9vw,52px)}
-.menu.main .tag{font-family:'Caveat',cursive;font-weight:600;font-size:23px;line-height:1.18;color:#223f6b;max-width:none}
-.menu.main .mlist{gap:9px}
-.menu.main .mbtn{background:transparent;backdrop-filter:none;border:2px solid #2b2318;color:#2b2318;font-family:'Caveat',cursive;font-weight:700;font-size:25px;letter-spacing:0;padding:5px 16px 6px;border-radius:255px 12px 225px 12px/12px 225px 12px 255px;transition:background .15s,transform .15s}
-.menu.main .mbtn small{font-family:var(--fb);font-size:11.5px;color:#6a5a40;font-weight:400}
-.menu.main .mbtn:nth-child(1){transform:rotate(-.6deg)}.menu.main .mbtn:nth-child(2){transform:rotate(.5deg);border-radius:14px 235px 12px 245px/235px 12px 245px 14px}
-.menu.main .mbtn:nth-child(3){transform:rotate(-.3deg);border-radius:240px 14px 250px 10px/12px 230px 14px 245px}.menu.main .mbtn:nth-child(4){transform:rotate(.7deg)}
-.menu.main .mbtn:nth-child(5){transform:rotate(-.5deg);border-radius:14px 250px 10px 230px/245px 12px 235px 14px}.menu.main .mbtn:nth-child(6){transform:rotate(.35deg)}
-.menu.main .mbtn:hover{background:rgba(242,162,46,.32);transform:translateX(3px) rotate(0)}
-.menu.main .mbtn:active{background:rgba(242,162,46,.5);transform:scale(.985)}
-.menu.main .mbtn.primary{background:linear-gradient(transparent 12%,rgba(242,162,46,.62) 12% 88%,transparent 88%);border-color:#2b2318;color:#1c1409}
-.menu.main .mbtn.primary small{color:#5a4320}
-.menu.main .mbtn:focus-visible{outline:2px dashed #223f6b;outline-offset:3px}
-.menu.main .foot{font-family:'Caveat',cursive;font-size:20px;font-weight:600;color:#5a4a35;line-height:1.15;max-width:none}
+.menu .eyebrow{font-family:'Caveat',cursive;font-size:21px;letter-spacing:.02em;font-weight:600;color:#9a3d1c;transform:rotate(-1deg);transform-origin:left}
+.menu h1{font-family:var(--fd);color:#1c2a33;text-shadow:1.5px 1px 0 rgba(0,0,0,.16);transform:rotate(-1.4deg);transform-origin:left;display:inline-block;justify-self:start;padding-bottom:12px;background:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 300 14' preserveAspectRatio='none'><path d='M3 8 C40 3 80 11 120 6 S200 9 240 5 S285 8 297 6' fill='none' stroke='%23f2a22e' stroke-width='5' stroke-linecap='round' opacity='.85'/><path d='M10 11 C70 8 150 12 280 9' fill='none' stroke='%23f2a22e' stroke-width='2' stroke-linecap='round' opacity='.6'/></svg>") left bottom/100% 13px no-repeat;font-size:clamp(34px,9vw,52px)}
+.menu .tag{font-family:'Caveat',cursive;font-weight:600;font-size:23px;line-height:1.18;color:#223f6b;max-width:none}
+.menu .mlist{gap:9px}
+.menu .mbtn{background:transparent;backdrop-filter:none;border:2px solid #2b2318;color:#2b2318;font-family:'Caveat',cursive;font-weight:700;font-size:25px;letter-spacing:0;padding:5px 16px 6px;border-radius:255px 12px 225px 12px/12px 225px 12px 255px;transition:background .15s,transform .15s}
+.menu .mbtn small{font-family:var(--fb);font-size:11.5px;color:#6a5a40;font-weight:400}
+.menu .mbtn:nth-child(1){transform:rotate(-.6deg)}.menu .mbtn:nth-child(2){transform:rotate(.5deg);border-radius:14px 235px 12px 245px/235px 12px 245px 14px}
+.menu .mbtn:nth-child(3){transform:rotate(-.3deg);border-radius:240px 14px 250px 10px/12px 230px 14px 245px}.menu .mbtn:nth-child(4){transform:rotate(.7deg)}
+.menu .mbtn:nth-child(5){transform:rotate(-.5deg);border-radius:14px 250px 10px 230px/245px 12px 235px 14px}.menu .mbtn:nth-child(6){transform:rotate(.35deg)}
+.menu .mbtn:hover{background:rgba(242,162,46,.32);transform:translateX(3px) rotate(0)}
+.menu .mbtn:active{background:rgba(242,162,46,.5);transform:scale(.985)}
+.menu .mbtn.primary{background:linear-gradient(transparent 12%,rgba(242,162,46,.62) 12% 88%,transparent 88%);border-color:#2b2318;color:#1c1409}
+.menu .mbtn.primary small{color:#5a4320}
+.menu .mbtn:focus-visible{outline:2px dashed #223f6b;outline-offset:3px}
+.menu .foot{font-family:'Caveat',cursive;font-size:20px;font-weight:600;color:#5a4a35;line-height:1.15;max-width:none}
 @keyframes jIn{from{opacity:0;transform:translateY(-16px) rotate(-3deg)}to{opacity:1;transform:rotate(-.6deg)}}
-@media (prefers-reduced-motion:reduce){.card.menu.main{animation:none}}
+@media (prefers-reduced-motion:reduce){.card.menu{animation:none}}
 @media (max-height:520px) and (orientation:landscape){
-  .card.menu.main{width:min(820px,100%);padding:20px 22px 14px;column-gap:22px}
-  .menu.main h1{font-size:36px;padding-bottom:9px;white-space:nowrap}
-  .menu.main .eyebrow{font-size:17px;white-space:nowrap;max-width:none}
-  .menu.main .tag{font-size:18px;line-height:1.12}
-  .menu.main .mlist{gap:5px}
-  .menu.main .mbtn{font-size:20px;padding:2px 14px 3px}
-  .menu.main .foot{font-size:16px}
+  .card.menu{padding:20px 22px 14px;column-gap:22px}
+  .card.menu.main{width:min(820px,100%)}
+  .menu h1{font-size:36px;padding-bottom:9px;white-space:nowrap}
+  .menu .eyebrow{font-size:17px;white-space:nowrap}
+  .menu .tag{font-size:18px;line-height:1.12}
+  .menu .mlist{gap:5px}
+  .menu .mbtn{font-size:20px;padding:2px 14px 3px}
+  .menu .foot{font-size:16px}
   .jfx svg{width:70px;height:42px;right:10px;top:10px}
 }
+
+#tut{position:fixed;left:50%;top:calc(252px + env(safe-area-inset-top,0px));transform:translateX(-50%) rotate(-.8deg);width:min(330px,calc(100vw - 24px));box-sizing:border-box;z-index:22;padding:12px 16px 12px;color:#2b2318;border-radius:3px 7px 4px 8px;pointer-events:none;
+  background:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='220' height='220'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' seed='4'/><feColorMatrix values='0 0 0 0 .35  0 0 0 0 .25  0 0 0 0 .1  0 0 0 .22 0'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>"),linear-gradient(172deg,#f3e9cd,#e8d9b4);box-shadow:0 2px 1px rgba(0,0,0,.25),0 14px 28px rgba(0,0,0,.5);animation:tutIn .4s cubic-bezier(.2,.9,.25,1.1) both}
+#tut::before{content:"";position:absolute;left:24px;top:-10px;width:62px;height:20px;background:rgba(236,216,142,.75);box-shadow:0 1px 2px rgba(0,0,0,.25);transform:rotate(-4deg)}
+#tut .tn{font-family:'Caveat',cursive;font-weight:700;font-size:17px;color:#9a3d1c}
+#tut h3{margin:0;font-family:'Caveat',cursive;font-weight:700;font-size:26px;line-height:1;color:#1c2a33}
+#tut p{margin:3px 0 0;font-family:'Caveat',cursive;font-weight:600;font-size:20px;line-height:1.1;color:#223f6b}
+#tut .tb{display:flex;gap:8px;align-items:center;justify-content:space-between;margin-top:8px}
+#tut button{pointer-events:auto;font-family:'Caveat',cursive;font-weight:700;font-size:20px;line-height:1;color:#2b2318;background:transparent;border:2px solid #2b2318;border-radius:255px 10px 225px 10px/10px 225px 10px 255px;padding:3px 14px 4px;cursor:pointer}
+#tut button.go{background:rgba(242,162,46,.6)}
+#tut button.sk{border-color:transparent;color:#6a5a40;font-size:17px;text-decoration:underline;padding:3px 4px}
+@keyframes tutIn{from{opacity:0;transform:translateX(-50%) translateY(-10px) rotate(-3deg)}to{opacity:1;transform:translateX(-50%) rotate(-.8deg)}}
+@media (max-height:520px) and (orientation:landscape){#tut{top:calc(8px + env(safe-area-inset-top,0px));width:min(320px,40vw)}body.hascode #tut{top:calc(66px + env(safe-area-inset-top,0px))}#tut p{font-size:18px}#tut h3{font-size:22px}}
+@media (prefers-reduced-motion:reduce){#tut{animation:none}}
+
+.card.menu input,.card.menu select{background:rgba(255,255,255,.4);color:#223f6b;border:2px solid #2b2318;border-radius:10px 14px 9px 13px;font-family:'Caveat',cursive;font-weight:700;font-size:22px}
+.card.menu input::placeholder{color:rgba(34,63,107,.5)}
+.card.menu .sec{font-family:'Caveat',cursive;font-weight:700;font-size:21px;letter-spacing:0;color:#9a3d1c}
+.card.menu .sec small{font-family:'Caveat',cursive;font-weight:600;font-size:18px;color:#223f6b;letter-spacing:0;display:block}
+.card.menu .seg button{font-family:'Caveat',cursive;font-weight:700;font-size:20px;color:#2b2318;background:transparent;border:2px solid #2b2318}
+.card.menu .seg button[aria-pressed="true"]{background:rgba(242,162,46,.6)}
+.card.menu p,.card.menu .note,.card.menu .row p{color:#3a2f20}
+.card.menu .crew{color:#2b2318}
+.card.menu .setrow,.card.menu .tally>div,.card.menu .ach{background:rgba(255,255,255,.28);border:2px solid rgba(43,35,24,.55);border-radius:12px 16px 11px 15px;color:#2b2318;backdrop-filter:none}
+.card.menu .tally>div b{color:#9a3d1c;font-family:'Caveat',cursive;font-size:30px;font-weight:700}
+.card.menu .tally>div span,.card.menu .setrow p,.card.menu .ach span,.card.menu .ach small{color:#4a3d2a}
+.card.menu .setrow h3{font-family:'Caveat',cursive;font-weight:700;font-size:23px;color:#1c2a33}
+.card.menu .ach{opacity:.7}
+.card.menu .ach.on{opacity:1;background:rgba(242,162,46,.35);border-color:#9a3d1c}
+.card.menu .ach b{font-family:'Caveat',cursive;font-weight:700;font-size:21px;color:#1c2a33}
+.card.menu .ach i{color:#b5560f}
 .mbtn.yel{background:#ffd60a;color:#2a2200;border-color:transparent;font-weight:700;box-shadow:0 0 0 2px rgba(255,214,10,.35),0 0 18px rgba(255,214,10,.45)}
 .mbtn.yel:hover{filter:brightness(1.06)}
 #giveBtn{position:fixed;right:calc(24px + env(safe-area-inset-right,0px));bottom:calc(var(--dockH) + 124px + env(safe-area-inset-bottom,0px));width:64px;height:64px;border-radius:50%;border:2px solid rgba(255,255,255,.5);background:rgba(255,214,10,.95);color:#2a2200;font-family:var(--fd);font-size:9.5px;letter-spacing:0;padding:0;touch-action:none;box-shadow:0 0 14px rgba(255,214,10,.5)}
@@ -400,6 +432,7 @@ body.touch #intro .kbtxt,body:not(.touch) #intro .tchtxt{display:none}
 <canvas id="game" tabindex="0" aria-label="Игровое поле: остров"></canvas>
 
 <div id="hud" hidden>
+  <div id="tut" hidden></div>
   <div id="islCode" hidden aria-live="polite"><span id="islCodeLbl">КОД ОСТРОВА</span><b id="islCodeVal"></b></div>
   <div id="sleepFx" hidden><div><b id="sleepLbl">Сон</b><span id="sleepSub" hidden></span><span class="kbtxt wk">Нажмите любую клавишу, чтобы проснуться</span><span class="tchtxt wk">Коснитесь экрана, чтобы проснуться</span></div></div>
   <div class="lt">
@@ -1338,6 +1371,7 @@ function updateHUD(){
   updateInventory();
   netCodeBadge();
   netGiveBtn();
+  tutTick();
   const ab = $('actBtn');
   const fight = !!(G.target && G.target.action && G.target.action.attack);
   ab.classList.toggle('fight', fight);
@@ -2030,7 +2064,6 @@ function showMenu(view){
         <button class="mbtn${sv ? '' : ' primary'}" type="button" data-m="new">Новая игра <small>${diff().name.toLowerCase()} сложность</small></button>
         ${coopButton()}
         ${ANDROID_WEB ? '<a class="mbtn" href="download/">Скачать приложение <small>для Android</small></a>' : ''}
-        <button class="mbtn" type="button" data-m="help">Как играть</button>
         <button class="mbtn" type="button" data-m="records">Рекорды и достижения <small>${ACH.filter(a => REC.ach[a.id]).length}/${ACH.length}</small></button>
         <button class="mbtn" type="button" data-m="settings">Настройки</button>
         ${fsButton()}
@@ -2046,7 +2079,6 @@ function showMenu(view){
       <h1 class="small">Пауза</h1>
       <nav class="mlist" aria-label="Меню паузы">
         <button class="mbtn primary" type="button" data-m="resume">Продолжить <small class="kb">Esc</small></button>
-        <button class="mbtn" type="button" data-m="help">Как играть</button>
         <button class="mbtn" type="button" data-m="settings">Настройки</button>
         ${fsButton()}
         <button class="mbtn" type="button" data-m="quit">Сохранить и выйти в меню</button>
@@ -6566,7 +6598,6 @@ function netPauseHTML(){
       <div class="crew">${rows.join('')}</div>
       <nav class="mlist" aria-label="Меню">
         <button class="mbtn primary" type="button" data-m="resume">Вернуться в игру <small class="kb">Esc</small></button>
-        <button class="mbtn" type="button" data-m="help">Как играть</button>
         <button class="mbtn" type="button" data-m="settings">Настройки</button>
         ${fsButton()}
         <button class="mbtn" type="button" data-m="quit">${host ? 'Сохранить, закрыть остров и выйти' : 'Покинуть остров'}</button>
@@ -6758,6 +6789,56 @@ function netPromote(){
   toast('Хозяин вышел. Теперь остров ведёте вы. Друг может вернуться по коду ' + NET.code.toUpperCase(), 'good');
   return true;
 }
+
+/* ---------- tutorial: a few notes on the first visit to the island ---------- */
+const TUT_KEY = 'last-flight-tutorial-v1';
+const TUT = { i:-1, fin:false, x0:0, y0:0, adv:0, craft:false, shown:-2 };
+const TUT_STEPS = [
+  { h:'Осмотритесь', p:'Ведите героя джойстиком слева (на компьютере W A S D). Сделайте несколько шагов.', ok:() => dist(player.x, player.y, TUT.x0, TUT.y0) > 140 },
+  { h:'Ящик у самолёта', p:'В грузовом ящике лежит снаряжение. Подойдите и нажмите оранжевую «Действие» (на компьютере E или пробел).', ok:() => !!G.crate },
+  { h:'Соберите материалы', p:'Нужны дерево, камни и лианы. Подходите к пальмам, камням и кустам и жмите «Действие». Собранное видно в сумке внизу.', ok:() => (inv.wood | 0) + (inv.stone | 0) + (inv.liana | 0) >= 3 },
+  { h:'Мастерская', p:'Нажмите «Мастерская» (C) наверху и посмотрите, что можно сделать: топор, нож, факел. Часть вещей делается без стола.', ok:() => TUT.craft },
+  { h:'Еда, вода, тепло', p:'Слева шкалы: здоровье, сытость, вода, силы, тепло. Вода из родника, еда: кокосы, ягоды, рыба, мясо кабана. Ночью холодно: греет костёр.', btn:'Понятно' },
+  { h:'Починить самолёт', p:'Нужно восстановить семь систем. Подойдите к самолёту, нажмите «Действие» и ставьте найденные детали. Цель всегда написана справа сверху.', btn:'Дальше' },
+  { h:'Пираты и кабаны', p:'Пираты приходят с моря и крадут детали: стройте стены (кнопка «Стройка») и держите нож или топор. Кабан опасен, зато с него мясо: жарьте его на костре.', btn:'Начать игру' }
+];
+function tutDone(){ TUT.fin = true; try { localStorage.setItem(TUT_KEY, '1'); } catch (e) {} const el = $('tut'); if (el) el.hidden = true; }
+function tutRender(){
+  const el = $('tut'), st = TUT_STEPS[TUT.i]; if (!el || !st) return;
+  el.innerHTML = '<div class="tn">Совет ' + (TUT.i + 1) + ' из ' + TUT_STEPS.length + '</div><h3>' + st.h + '</h3><p>' + st.p + '</p><div class="tb">' + (st.btn ? '<button type="button" class="go" data-tut="next">' + st.btn + '</button>' : '<span></span>') + '<button type="button" class="sk" data-tut="skip">пропустить обучение</button></div>';
+  el.style.animation = 'none'; void el.offsetWidth; el.style.animation = '';
+}
+function tutNext(){
+  TUT.i++;
+  if (TUT.i >= TUT_STEPS.length){ tutDone(); return; }
+  TUT.shown = -2; TUT.adv = 0; tutRender();
+}
+function tutTick(){
+  const el = $('tut'); if (!el || TUT.fin) return;
+  if (G.mode !== 'play'){ if (!el.hidden) el.hidden = true; if (G.mode === 'title') TUT.i = -1; return; }
+  if (TUT.i === -1){
+    let seen = false; try { seen = localStorage.getItem(TUT_KEY) === '1'; } catch (e) {}
+    const fresh = NET.role === 'guest' || (G.day === 1 && !G.crate && !Object.keys(G.repairs || {}).length);
+    if (seen || !fresh){ TUT.fin = true; el.hidden = true; return; }
+    TUT.i = 0; TUT.x0 = player.x; TUT.y0 = player.y; TUT.craft = false; TUT.adv = 0; tutRender();
+  }
+  const st = TUT_STEPS[TUT.i]; if (!st) return;
+  if (panelKind === 'craft') TUT.craft = true;
+  const hide = !!(panelKind && !(st.h === 'Мастерская')) || G.paused && NET.role === 'solo' || player.down || G.sleep;
+  if (el.hidden !== hide) el.hidden = hide;
+  if (hide) return;
+  if (st.ok){
+    if (st.ok()){ if (!TUT.adv) TUT.adv = performance.now(); else if (performance.now() - TUT.adv > 700){ toast('Отлично, дальше', 'good'); tutNext(); } }
+  }
+}
+(function tutInit(){
+  const el = $('tut'); if (!el) return;
+  el.addEventListener('click', e => {
+    const b = e.target.closest && e.target.closest('[data-tut]'); if (!b) return;
+    if (b.dataset.tut === 'skip') tutDone(); else tutNext();
+  });
+  setInterval(() => { try { tutTick(); } catch (e) {} }, 300);
+})();
 
 /* ================= Boot ================= */
 loadSettings();
