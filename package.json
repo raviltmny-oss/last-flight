@@ -1,0 +1,10 @@
+{
+  "name": "last-flight",
+  "version": "1.5.0",
+  "private": true,
+  "description": "Последний рейс: игра в браузере, приложение для Android и сервер для игры вдвоём",
+  "main": "server.js",
+  "scripts": { "start": "node server.js" },
+  "engines": { "node": ">=18" },
+  "dependencies": { "ws": "8.18.0" }
+}

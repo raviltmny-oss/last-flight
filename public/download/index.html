@@ -1,0 +1,62 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Скачать «Последний рейс»</title>
+<meta name="theme-color" content="#0e1a22">
+<link rel="icon" type="image/png" href="../icons/favicon-64.png">
+<style>
+/* the download page of our own site: one column, the app first */
+:root{--bg:#0e1a22;--card:#13252f;--fg:#f3ead6;--muted:#9fb1ae;--line:rgba(243,234,214,.15);--accent:#f29a2e;--accent-fg:#2a1600;color-scheme:dark}
+html,body{margin:0}
+body{background:var(--bg);color:var(--fg);font:16px/1.5 system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;padding:28px max(16px,env(safe-area-inset-right,0px)) 40px max(16px,env(safe-area-inset-left,0px))}
+main{max-width:560px;margin:0 auto;display:grid;gap:22px}
+.top{display:flex;gap:16px;align-items:center}
+.top img{width:84px;height:84px;border-radius:20px;flex:none}
+h1{font:800 clamp(28px,8vw,40px)/1.05 system-ui,sans-serif;margin:0;letter-spacing:.01em;text-wrap:balance}
+.lede{margin:6px 0 0;color:var(--muted)}
+.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:18px;display:grid;gap:14px}
+.meta{display:flex;flex-wrap:wrap;gap:6px 18px;font-size:14px;color:var(--muted)}
+.meta b{color:var(--fg);font-weight:600}
+a.btn{display:block;text-align:center;text-decoration:none;border-radius:10px;padding:16px;font-weight:700;font-size:18px;background:var(--accent);color:var(--accent-fg)}
+a.btn.alt{background:transparent;color:var(--fg);border:1px solid var(--line);font-size:16px;font-weight:600}
+a.btn:focus-visible{outline:2px solid var(--fg);outline-offset:2px}
+h2{font-size:19px;margin:0}
+ol{margin:0;padding-left:22px;display:grid;gap:8px}
+ol li::marker{color:var(--accent);font-weight:700}
+.note{font-size:14px;color:var(--muted);margin:0}
+</style>
+</head>
+<body>
+<main>
+  <div class="top">
+    <img src="../icons/icon-192.png" alt="">
+    <div><h1>Последний рейс</h1><p class="lede">Почините самолёт и улетайте с острова, пока пираты не растащили его по частям. Одному или вдвоём.</p></div>
+  </div>
+
+  <div class="card">
+    <h2>Приложение для Android</h2>
+    <div class="meta"><span>Версия <b>1.4.4</b></span><span>Размер <b>0,7 МБ</b></span><span>Android <b>7.0+</b></span></div>
+    <a class="btn" href="../last-flight.apk" download="last-flight.apk">Скачать приложение</a>
+  </div>
+
+  <section class="card">
+    <h2>Как установить</h2>
+    <ol>
+      <li>Нажмите «Скачать приложение». Если браузер спросит, сохранить ли файл, нажмите «Скачать».</li>
+      <li>Откройте скачанный файл: из уведомления или из папки «Загрузки».</li>
+      <li>Телефон спросит, можно ли ставить приложения из браузера. Разрешите.</li>
+      <li>Нажмите «Установить». Прошлая версия обновится, сохранения останутся.</li>
+    </ol>
+    <p class="note">Приложение не из Google Play, поэтому телефон может предупредить о неизвестном источнике. Это обычное предупреждение для приложений, которые ставят напрямую.</p>
+  </section>
+
+  <section class="card">
+    <h2>iPhone и компьютер</h2>
+    <p class="note">Играйте прямо в браузере. На iPhone в Safari нажмите «Поделиться», затем «На экран «Домой»»: игра откроется на весь экран и будет работать без интернета.</p>
+    <a class="btn alt" href="../">Играть в браузере</a>
+  </section>
+</main>
+</body>
+</html>
